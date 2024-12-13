@@ -1,47 +1,49 @@
 #include <GL/glut.h>
-#include <cstdlib>
-#include <ctime>
-#include "scenario_nonstatic.h"
+#include <cstdlib> // Para rand()
+#include <ctime>   // Para seed do rand()
 
-#define NUM_SNOWFLAKES 100
+#define NUM_FLOCOS 200 // Número de flocos de neve
 
-struct Snowflake {
-    float x, y, z;
-    float speed;
+// Estrutura para representar um floco de neve
+struct FlocoDeNeve {
+    float x, y, z;   // Posição
+    float velocidade; // Velocidade de descida
 };
 
-Snowflake snowflakes[NUM_SNOWFLAKES];
+// Array para os flocos de neve
+FlocoDeNeve flocos[NUM_FLOCOS];
 
-void initSnowflakes() {
-    std::srand(std::time(0));
-    for (int i = 0; i < NUM_SNOWFLAKES; i++) {
-        snowflakes[i].x = (std::rand() % 100 - 50) / 5.0f; // X: -10 a 10
-        snowflakes[i].y = (std::rand() % 100) / 5.0f + 5.0f; // Y: 5 a 25
-        snowflakes[i].z = (std::rand() % 100 - 50) / 5.0f; // Z: -10 a 10
-        snowflakes[i].speed = (std::rand() % 50 + 10) / 500.0f; // Velocidade
+// Inicializa os flocos de neve
+void inicializarNeve() {
+    srand(time(0)); // Semente para números aleatórios
+    for (int i = 0; i < NUM_FLOCOS; i++) {
+        flocos[i].x = ((rand() % 200) - 100) / 10.0f; // Aleatório entre -10 e 10
+        flocos[i].y = ((rand() % 200) / 10.0f);       // Aleatório entre 0 e 20
+        flocos[i].z = ((rand() % 200) - 100) / 10.0f; // Aleatório entre -10 e 10
+        flocos[i].velocidade = ((rand() % 50) + 10) / 1000.0f; // Aleatório entre 0.01 e 0.05
     }
 }
 
-void drawSnowflakes() {
-    for (int i = 0; i < NUM_SNOWFLAKES; i++) {
-        glPushMatrix();
-        glColor3f(1.0f, 1.0f, 1.0f); // Branco
-        glTranslatef(snowflakes[i].x, snowflakes[i].y, snowflakes[i].z);
-        glutSolidSphere(0.05f, 10, 10);
-        glPopMatrix();
-
-        // Atualiza a posição Y (queda)
-        snowflakes[i].y -= snowflakes[i].speed;
-
-        // Reaparece no topo se ultrapassar o chão
-        if (snowflakes[i].y < -1.0f) {
-            snowflakes[i].y = 25.0f; // Reaparece no topo
-            snowflakes[i].x = (std::rand() % 100 - 50) / 5.0f; // Nova posição X
-            snowflakes[i].z = (std::rand() % 100 - 50) / 5.0f; // Nova posição Z
+// Atualiza os flocos de neve
+void atualizarNeve() {
+    for (int i = 0; i < NUM_FLOCOS; i++) {
+        flocos[i].y -= flocos[i].velocidade; // Floco desce
+        if (flocos[i].y < -1.5f) {           // Se sair do chão, reinicia no topo
+            flocos[i].x = ((rand() % 200) - 100) / 10.0f;
+            flocos[i].y = 20.0f;
+            flocos[i].z = ((rand() % 200) - 100) / 10.0f;
+            flocos[i].velocidade = ((rand() % 50) + 10) / 1000.0f;
         }
     }
 }
 
-void drawNonStaticScenario() {
-    drawSnowflakes();
+// Desenha os flocos de neve
+void desenharNeve() {
+    glColor3f(1.0f, 1.0f, 1.0f); // Cor branca para a neve
+    for (int i = 0; i < NUM_FLOCOS; i++) {
+        glPushMatrix();
+        glTranslatef(flocos[i].x, flocos[i].y, flocos[i].z);
+        glutSolidSphere(0.05f, 10, 10); // Cada floco é uma esfera pequena
+        glPopMatrix();
+    }
 }
