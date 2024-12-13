@@ -1,3 +1,4 @@
+// Winn:  g++ -Wall -Linclude -g main.cpp snowman_body.cpp snowman_arms.cpp scenario_static.cpp scenario_nonstatic.cpp -o main.exe -Llib -lopengl32 -lglu32 -lfreeglut
 #include "include/GL/glut.h"
 #include "scenario_static.h"
 #include "scenario_nonstatic.h"
