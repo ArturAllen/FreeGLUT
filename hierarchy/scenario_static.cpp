@@ -36,23 +36,17 @@ void carregarTexturaMadeira() {
 // Desenha um cilindro texturizado
 void desenhaCilindro(float base, float altura) {
     GLUquadric* quad = gluNewQuadric();
-
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texturaMadeira);
-
-    // Configurações do quadric para usar textura
-    gluQuadricTexture(quad, GL_TRUE);
+    //glBindTexture(GL_TEXTURE_2D, texturaMadeira);
+    gluQuadricTexture(quad, GL_TRUE); // Ativa a textura para o cilindro
     gluQuadricNormals(quad, GLU_SMOOTH);
-
-    // Desenha o cilindro
     gluCylinder(quad, base, base, altura, 50, 50);
-
     glDisable(GL_TEXTURE_2D);
     gluDeleteQuadric(quad);
 }
 GLuint texturaChao;
 
-void drawStaticScenario() {
+void drawStaticScenario(GLuint texId) {
     // Base do globo de neve (tronco de cone com faces superior e inferior)
     glPushMatrix();
     glColor3f(0.6f, 0.6f, 0.6f); // Cor da base (cinza)
@@ -101,4 +95,28 @@ void drawStaticScenario() {
     glRotatef(-90, 1.0f, 0.0f, 0.0f); // Rotação para alinhar ao eixo Y
     glutSolidCone(0.9f, 1.5f, 50, 50); // Cone superior maior
     glPopMatrix();
+}
+
+
+void carregarTextura(const char* nomeArquivo, GLuint &id)
+{
+    int largura, altura, canais;
+    unsigned char *dados = stbi_load(nomeArquivo, &largura, &altura, &canais, 0);
+
+    if (!dados)
+        exit(1);
+
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, (canais == 4) ? GL_RGBA : GL_RGB,
+                 largura, altura, 0, (canais == 4) ? GL_RGBA : GL_RGB,
+                 GL_UNSIGNED_BYTE, dados);
+
+    stbi_image_free(dados);
 }

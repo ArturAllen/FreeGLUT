@@ -10,4 +10,6 @@ void atualizarNeve();
 // Desenha os flocos de neve
 void desenharNeve();
 
+void configurarLuzSecundaria(float intensidade);
+
 #endif // SCENARIO_NONSTATIC_H

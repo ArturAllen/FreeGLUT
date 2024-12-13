@@ -11,6 +11,8 @@ float angulo_x = 0.0f, angulo_y = 0.0f, zoom = -10.0f; // Ângulos e zoom
 int last_x = 0, last_y = 0;                            // Última posição do mouse
 bool left_button_pressed = false;                      // Estado do botão esquerdo
 
+GLuint woodTexId;
+
 // Prototipos das funções para neve
 void inicializarNeve();
 void atualizarNeve();
@@ -74,8 +76,12 @@ void inicializa() {
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
+    configurarLuzSecundaria(0.5);
+
     // Inicializar neve
     inicializarNeve();
+
+    carregarTextura("textura/wood.png", woodTexId);
 }
 
 void display() {
@@ -92,16 +98,16 @@ void display() {
     glLightfv(GL_LIGHT0, GL_POSITION, posicaoLuz);
 
     // Desenhar o cenário
-    drawStaticScenario();  // Elementos estáticos
+    drawStaticScenario(woodTexId);  // Elementos estáticos
     drawSnowmanBody();     // Boneco de neve
-    drawSnowmanArms();     // Braços do boneco
-
-    // Desenhar o domo semi-transparente
-    desenharDomo();
+    drawSnowmanArms(woodTexId);     // Braços do boneco
 
     // Atualizar e desenhar a neve
     atualizarNeve();
     desenharNeve();
+
+    // Desenhar o domo semi-transparente
+    desenharDomo();
 
     glutSwapBuffers();
 }
@@ -117,18 +123,67 @@ void reshape(int largura, int altura) {
     glLoadIdentity();
 }
 
+bool left_arrow_key_pressed = false;
+bool right_arrow_key_pressed = false;
+
+int ombro_direito = 0, cotovelo_direito = 0;
+int ombro_esquerdo = 0, cotovelo_esquerdo = 0;
+
 void teclado(unsigned char tecla, int x, int y) {
     switch (tecla) {
+        case '=':
         case '+':
             zoom += 0.5f; // Aproximar
             break;
         case '-':
             zoom -= 0.5f; // Afastar
             break;
+        case 'c':
+            if (left_arrow_key_pressed && cotovelo_esquerdo < 120) cotovelo_esquerdo += 5;
+            if (right_arrow_key_pressed && cotovelo_direito < 120) cotovelo_direito += 5;
+
+            setBracoEsquerdo(ombro_esquerdo, cotovelo_esquerdo, 0);
+            setBracoDireito(ombro_direito, cotovelo_direito, 0);
+
+            break;
+        case 'C':
+            if (left_arrow_key_pressed && cotovelo_esquerdo > 0) cotovelo_esquerdo -= 5;
+            if (right_arrow_key_pressed && cotovelo_direito > 0) cotovelo_direito -= 5;
+
+            setBracoEsquerdo(ombro_esquerdo, cotovelo_esquerdo, 0);
+            setBracoDireito(ombro_direito, cotovelo_direito, 0);
+
+            break;
+        case 'o':
+            if (left_arrow_key_pressed && ombro_esquerdo < 80) ombro_esquerdo += 5;
+            if (right_arrow_key_pressed && ombro_direito < 80) ombro_direito += 5;
+
+            setBracoEsquerdo(ombro_esquerdo, cotovelo_esquerdo, 0);
+            setBracoDireito(ombro_direito, cotovelo_direito, 0);
+
+            break;
+        case 'O':
+            if (left_arrow_key_pressed && ombro_esquerdo > -60) ombro_esquerdo -= 5;
+            if (right_arrow_key_pressed && ombro_direito > -60) ombro_direito -= 5;
+
+            setBracoEsquerdo(ombro_esquerdo, cotovelo_esquerdo, 0);
+            setBracoDireito(ombro_direito, cotovelo_direito, 0);
+
+            break;
         case 27: // Tecla Esc para sair
             exit(0);
     }
     glutPostRedisplay();
+}
+
+void arrowKeysDown(int key, int x, int y) {
+    if (key == GLUT_KEY_LEFT) left_arrow_key_pressed = true;
+    if (key == GLUT_KEY_RIGHT) right_arrow_key_pressed = true;
+}
+
+void arrowKeysUp(int key, int x, int y) {
+    if (key == GLUT_KEY_LEFT) left_arrow_key_pressed = false;
+    if (key == GLUT_KEY_RIGHT) right_arrow_key_pressed = false;
 }
 
 void mouseMotion(int x, int y) {
@@ -149,6 +204,22 @@ void mouseButton(int button, int state, int x, int y) {
     }
 }
 
+void menu(int option) {
+    switch (option){
+        case 0: // Forte
+            configurarLuzSecundaria(1.0);
+            break;
+        case 1: // Medio
+            configurarLuzSecundaria(0.5);
+            break;
+        case 2: // Fraco
+            configurarLuzSecundaria(0.1);
+            break;
+        default:
+            break;
+    }
+}
+
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -160,9 +231,18 @@ int main(int argc, char** argv) {
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(teclado);
+    glutSpecialFunc(arrowKeysDown);
+    glutSpecialUpFunc(arrowKeysUp);
     glutMotionFunc(mouseMotion);
     glutMouseFunc(mouseButton);
     glutIdleFunc(display); // Atualizar continuamente
+    
+    glutCreateMenu(menu);
+    glutAddMenuEntry("Forte", 0);
+    glutAddMenuEntry("Media", 1);
+    glutAddMenuEntry("Fraca", 2);
+
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
 
     glutMainLoop();
     return 0;

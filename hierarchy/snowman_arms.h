@@ -4,7 +4,12 @@
 extern int ombroEsquerdo, cotoveloEsquerdo, maoEsquerda;
 extern int ombroDireito, cotoveloDireito, maoDireita;
 
-void carregarTextura();
-void drawSnowmanArms();
+void initTextures();
+//void carregarTextura();
+void drawSnowmanArms(GLuint texId);
+
+void setBracoEsquerdo(int ombro, int cotovelo, int mao);
+
+void setBracoDireito(int ombro, int cotovelo, int mao);
 
 #endif
