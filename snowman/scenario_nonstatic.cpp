@@ -18,24 +18,23 @@ struct FlocoDeNeve {
 // Array para os flocos de neve
 FlocoDeNeve flocos[NUM_FLOCOS];
 
+bool estaForaDoDomo(const FlocoDeNeve &floco);
+
 // Função para gerar uma posição aleatória dentro do domo
 void gerarPosicaoDentroDomo(FlocoDeNeve &floco) {
-    // do {
-    //     floco.x = ((rand() % 200) - 100) / 18.0f; // Aleatório entre -5.5 e 5.5
-    //     floco.y = ((rand() % 480) - 150) / 100.0f; // Aleatório entre -1.5 e 3.3
-    //     floco.z = ((rand() % 200) - 100) / 18.0f; // Aleatório entre -5.5 e 5.5
-    // } while (floco.x * floco.x + floco.y * floco.y + floco.z * floco.z > RAIO_DOMO * RAIO_DOMO);
+    float theta = ((float)(rand() % 360)) * 2 * M_PI / 360.0f;   // Azimuthal angle (0 to 2π)
+    float phi = ((float)(rand() % 180)) - 90.0f;                 // Polar angle (-90 to 90 degrees)
+    phi = phi * M_PI / 180.0f;  // Convert phi to radians
+    float radius = ((float)rand() / (float)RAND_MAX ) * (float)RAIO_DOMO;  // Random radius between 0 and RAIO_DOMO
 
-    float angle = ((float)(rand() % 360)) * 2 * M_PI / 360.0f;
-    float radius = 0.8 * ((float)rand() / (float)RAND_MAX ) * (float)RAIO_DOMO;
+    floco.y = radius * sinf(phi) + ALTURA_MAXIMA_DOMO;  // Y position
+    floco.x = radius * cosf(phi) * cosf(theta);         // X position
+    floco.z = radius * cosf(phi) * sinf(theta);         // Z position
 
-    floco.x = cosf(angle) * radius;
-    floco.z = sinf(angle) * radius;
-    floco.y = ((float)rand() / (float)RAND_MAX ) * 2 * ALTURA_MAXIMA_DOMO;
-
-    floco.velX = ((rand() % 100) - 50) / 20000.0f; // Aleatório entre -0.025 e 0.025
-    floco.velY = ((rand() % 100) + 10) / 10000.0f;  // Aleatório entre 0.01 e 0.1
-    floco.velZ = ((rand() % 100) - 50) / 20000.0f; // Aleatório entre -0.025 e 0.025
+    // Random velocities
+    floco.velX = ((rand() % 100) - 50) / 20000.0f;  // Random velocity between -0.025 and 0.025
+    floco.velY = ((rand() % 100) + 10) / 10000.0f;  // Random velocity between 0.01 and 0.1
+    floco.velZ = ((rand() % 100) - 50) / 20000.0f;  // Random velocity between -0.025 and 0.025
 }
 
 // Inicializa os flocos de neve
@@ -61,11 +60,23 @@ void atualizarNeve() {
         //     gerarPosicaoDentroDomo(flocos[i]);
         // }
         // Reposicionar floco se sair dos limites do domo
-        if (flocos[i].x * flocos[i].x + flocos[i].z * flocos[i].z > 0.8 * 0.8 * RAIO_DOMO * RAIO_DOMO || flocos[i].y < ALTURA_MINIMA_DOMO) {
+        if (estaForaDoDomo(flocos[i]) || flocos[i].y < ALTURA_MINIMA_DOMO) {
             gerarPosicaoDentroDomo(flocos[i]);
         }
     }
 }
+
+bool estaForaDoDomo(const FlocoDeNeve &floco) {
+    // Adjust the y-coordinate to consider the constant height offset
+    float yAjustado = floco.y - ALTURA_MAXIMA_DOMO;
+    
+    // Calculate the distance squared from the origin (0, 0, 0) to the snowflake's adjusted position
+    float distanciaQuadrada = floco.x * floco.x + yAjustado * yAjustado + floco.z * floco.z;
+
+    // If the distance squared is greater than the square of the dome radius, it's outside
+    return distanciaQuadrada > (RAIO_DOMO * RAIO_DOMO);
+}
+
 
 // Desenha os flocos de neve
 void desenharNeve() {
