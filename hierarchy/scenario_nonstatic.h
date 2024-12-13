@@ -1,7 +1,13 @@
 #ifndef SCENARIO_NONSTATIC_H
 #define SCENARIO_NONSTATIC_H
 
-void initSnowflakes();
-void drawNonStaticScenario();
+// Inicializa os flocos de neve
+void inicializarNeve();
 
-#endif
+// Atualiza os flocos de neve
+void atualizarNeve();
+
+// Desenha os flocos de neve
+void desenharNeve();
+
+#endif // SCENARIO_NONSTATIC_H

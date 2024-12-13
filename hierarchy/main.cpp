@@ -16,6 +16,42 @@ void inicializarNeve();
 void atualizarNeve();
 void desenharNeve();
 
+// Função para desenhar o domo semi-transparente com corte inferior
+void desenharDomo() {
+    glPushMatrix();
+
+    // Ativar semi-transparência
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Cor e transparência do domo
+    glColor4f(1.0f, 1.0f, 1.0f, 0.2f); // Branco semi-transparente
+
+    // Posicionar o domo
+    glTranslatef(0.0f, 3.3f, 0.0f); // Ajustar altura para a base do domo
+
+    // Habilitar o plano de corte
+    GLdouble planoCorte[] = {0.0, 0.15, 0.0, 0.6}; // Plano que corta apenas 10% inferior do domo
+    glClipPlane(GL_CLIP_PLANE0, planoCorte);
+    glEnable(GL_CLIP_PLANE0);
+
+    // Criar a parte superior do domo (esfera cortada)
+    GLUquadric* quad = gluNewQuadric();
+    gluQuadricNormals(quad, GLU_SMOOTH);
+    gluQuadricDrawStyle(quad, GLU_FILL);
+    gluSphere(quad, 5.5f, 50, 50); // Esfera com raio 6.0
+
+    // Desativar o plano de corte
+    glDisable(GL_CLIP_PLANE0);
+
+    gluDeleteQuadric(quad);
+
+    // Desativar semi-transparência
+    glDisable(GL_BLEND);
+
+    glPopMatrix();
+}
+
 void inicializa() {
     glClearColor(0.5f, 0.8f, 1.0f, 1.0f); // Fundo azul-claro (céu)
     glEnable(GL_DEPTH_TEST);              // Ativar teste de profundidade
@@ -59,6 +95,9 @@ void display() {
     drawStaticScenario();  // Elementos estáticos
     drawSnowmanBody();     // Boneco de neve
     drawSnowmanArms();     // Braços do boneco
+
+    // Desenhar o domo semi-transparente
+    desenharDomo();
 
     // Atualizar e desenhar a neve
     atualizarNeve();

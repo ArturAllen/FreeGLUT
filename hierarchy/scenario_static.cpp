@@ -75,7 +75,7 @@ void drawStaticScenario() {
 
     // Tronco da árvore (cilíndrico com textura)
     glPushMatrix();
-    glTranslatef(-3.5f, 0.0f, -3.0f); // Ajuste no eixo Y para começar na face superior
+    glTranslatef(-2.0f, 0.0f, -2.0f); // Ajuste no eixo Y para começar na face superior
     glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // Rotação para alinhar ao eixo Y
     desenhaCilindro(0.3f, 3.0f); // Base maior (0.3) e altura maior (3.0)
     glPopMatrix();
@@ -83,21 +83,21 @@ void drawStaticScenario() {
     // Folhas da árvore (cones alinhados ao eixo Y)
     glPushMatrix();
     glColor3f(0.0f, 0.5f, 0.0f); // Verde
-    glTranslatef(-3.5f, 1.5f, -3.0f); // Posição inicial do cone inferior
+    glTranslatef(-2.0f, 1.5f, -2.0f); // Posição inicial do cone inferior
     glRotatef(-90, 1.0f, 0.0f, 0.0f); // Rotação para alinhar ao eixo Y
     glutSolidCone(1.5f, 3.0f, 50, 50); // Cone inferior maior
     glPopMatrix();
 
     glPushMatrix();
     glColor3f(0.0f, 0.5f, 0.0f); // Verde
-    glTranslatef(-3.5f, 3.0f, -3.0f); // Posição inicial do cone do meio
+    glTranslatef(-2.0f, 3.0f, -2.0f); // Posição inicial do cone do meio
     glRotatef(-90, 1.0f, 0.0f, 0.0f); // Rotação para alinhar ao eixo Y
     glutSolidCone(1.2f, 2.25f, 50, 50); // Cone do meio maior
     glPopMatrix();
 
     glPushMatrix();
     glColor3f(0.0f, 0.5f, 0.0f); // Verde
-    glTranslatef(-3.5f, 4.2f, -3.0f); // Posição inicial do cone superior
+    glTranslatef(-2.0f, 4.2f, -2.0f); // Posição inicial do cone superior
     glRotatef(-90, 1.0f, 0.0f, 0.0f); // Rotação para alinhar ao eixo Y
     glutSolidCone(0.9f, 1.5f, 50, 50); // Cone superior maior
     glPopMatrix();

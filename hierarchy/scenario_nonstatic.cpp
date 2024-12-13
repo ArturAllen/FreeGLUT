@@ -1,49 +1,60 @@
 #include <GL/glut.h>
-#include <cstdlib> // Para rand()
-#include <ctime>   // Para seed do rand()
+#include <cstdlib>
+#include <ctime> 
+#include <cmath> 
 
-#define NUM_FLOCOS 200 // Número de flocos de neve
+#define NUM_FLOCOS 200
+#define RAIO_DOMO 5.5f
+#define ALTURA_MAXIMA_DOMO 3.3f 
+#define ALTURA_MINIMA_DOMO
+#define GRAVIDADE 0.002f
 
-// Estrutura para representar um floco de neve
 struct FlocoDeNeve {
-    float x, y, z;   // Posição
-    float velocidade; // Velocidade de descida
+    float x, y, z; 
+    float velX, velY, velZ; 
 };
 
-// Array para os flocos de neve
 FlocoDeNeve flocos[NUM_FLOCOS];
 
-// Inicializa os flocos de neve
+void gerarPosicaoDentroDomo(FlocoDeNeve &floco) {
+    do {
+        floco.x = ((rand() % 200) - 100) / 18.0f; 
+        floco.y = ((rand() % 480) - 150) / 100.0f;
+        floco.z = ((rand() % 200) - 100) / 18.0f;
+    } while (floco.x * floco.x + floco.y * floco.y + floco.z * floco.z > RAIO_DOMO * RAIO_DOMO);
+
+    floco.velX = ((rand() % 100) - 50) / 2000.0f;
+    floco.velY = ((rand() % 100) + 10) / 1000.0f;
+    floco.velZ = ((rand() % 100) - 50) / 2000.0f;
+}
+
 void inicializarNeve() {
-    srand(time(0)); // Semente para números aleatórios
+    srand(time(0)); 
     for (int i = 0; i < NUM_FLOCOS; i++) {
-        flocos[i].x = ((rand() % 200) - 100) / 10.0f; // Aleatório entre -10 e 10
-        flocos[i].y = ((rand() % 200) / 10.0f);       // Aleatório entre 0 e 20
-        flocos[i].z = ((rand() % 200) - 100) / 10.0f; // Aleatório entre -10 e 10
-        flocos[i].velocidade = ((rand() % 50) + 10) / 1000.0f; // Aleatório entre 0.01 e 0.05
+        gerarPosicaoDentroDomo(flocos[i]);
     }
 }
 
-// Atualiza os flocos de neve
 void atualizarNeve() {
     for (int i = 0; i < NUM_FLOCOS; i++) {
-        flocos[i].y -= flocos[i].velocidade; // Floco desce
-        if (flocos[i].y < -1.5f) {           // Se sair do chão, reinicia no topo
-            flocos[i].x = ((rand() % 200) - 100) / 10.0f;
-            flocos[i].y = 20.0f;
-            flocos[i].z = ((rand() % 200) - 100) / 10.0f;
-            flocos[i].velocidade = ((rand() % 50) + 10) / 1000.0f;
+        flocos[i].x += flocos[i].velX;
+        flocos[i].y += flocos[i].velY; 
+        flocos[i].z += flocos[i].velZ;
+
+        flocos[i].velY -= GRAVIDADE;
+
+        if (flocos[i].x * flocos[i].x + flocos[i].y * flocos[i].y + flocos[i].z * flocos[i].z > RAIO_DOMO * RAIO_DOMO || flocos[i].y < ALTURA_MINIMA_DOMO) {
+            gerarPosicaoDentroDomo(flocos[i]);
         }
     }
 }
 
-// Desenha os flocos de neve
 void desenharNeve() {
-    glColor3f(1.0f, 1.0f, 1.0f); // Cor branca para a neve
+    glColor3f(1.0f, 1.0f, 1.0f); 
     for (int i = 0; i < NUM_FLOCOS; i++) {
         glPushMatrix();
         glTranslatef(flocos[i].x, flocos[i].y, flocos[i].z);
-        glutSolidSphere(0.05f, 10, 10); // Cada floco é uma esfera pequena
+        glutSolidSphere(0.05f, 10, 10); 
         glPopMatrix();
     }
 }
